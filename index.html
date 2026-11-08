@@ -230,11 +230,11 @@
 
     <!-- 4. Tiled Courtyard Floor with Central Rangoli & 5 Geometric Diyas -->
     <div id="terrace-floor-container"
-      class="terrace-floor relative w-full h-[38vh] sm:h-[42vh] flex items-center justify-center pointer-events-auto">
+      class="terrace-floor relative w-full min-h-[42vh] sm:min-h-[46vh] flex flex-col items-center justify-center pb-12 sm:pb-16 pointer-events-auto">
 
       <!-- Central Circular Rangoli & Diya Mount -->
       <div id="rangoli-container"
-        class="relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 flex items-center justify-center">
+        class="relative w-56 h-56 sm:w-72 sm:h-72 md:w-80 md:h-80 flex items-center justify-center">
 
         <!-- Handcrafted Traditional Floral Rangoli SVG (Completely Dark & Invisible Initially, Blooms on Lighting) -->
         <svg id="terrace-rangoli-art" viewBox="0 0 300 300"
@@ -425,6 +425,9 @@
         </div>
 
       </div>
+
+      <!-- Empty Bottom Footer Buffer to ensure bottom Diya is completely visible on all screens -->
+      <footer class="w-full h-4 sm:h-6 pointer-events-none flex-shrink-0"></footer>
 
     </div>
 

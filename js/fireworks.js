@@ -49,6 +49,11 @@ class FireworksEngine {
   }
 
   getHorizonY() {
+    const floor = document.getElementById('terrace-floor-container');
+    if (floor) {
+      const rect = floor.getBoundingClientRect();
+      if (rect.top > 0) return rect.top;
+    }
     return this.height * 0.54;
   }
 
