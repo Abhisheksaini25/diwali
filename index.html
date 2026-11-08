@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Happy Diwali ✨</title>
+  <meta name="description"
+    content="Cinematic rooftop Diwali celebration with interactive geometric rangoli diyas, virtual fireworks, anar, chakri, and atmospheric skyline view.">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Custom Styles (Zero external CDN dependency for core rendering) -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body
+  class="relative w-screen h-screen max-h-screen overflow-hidden bg-gradient-to-b from-[#080214] via-[#140624] to-[#12051e] flex flex-col justify-between selection:bg-amber-500 selection:text-stone-950">
+
+  <!-- Ambient Floating Lanterns Container -->
+  <div id="ambient-lanterns-container" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
+
+  <!-- Fullscreen Interactive Canvas for Fireworks, Anar, Chakri & Sparklers (z-30: In front of floor & terrace) -->
+  <canvas id="fireworks-canvas" class="fixed inset-0 z-30 pointer-events-none"></canvas>
+
+  <!-- MINIMALIST TOP HEADER (Icon-only controls with inline SVG, Zero CDN failure) -->
+  <header
+    class="relative z-50 pt-3 sm:pt-4 px-4 sm:px-8 w-full max-w-7xl mx-auto flex items-center justify-between pointer-events-auto">
+    <!-- Brand Mark -->
+    <div class="flex items-center gap-2 select-none opacity-90 hover:opacity-100 transition-opacity">
+      <span class="text-base sm:text-lg">🪔</span>
+      <span
+        class="text-xs sm:text-sm font-serif-decorative font-bold tracking-widest text-amber-300/90">DEEPOTSAV</span>
+    </div>
+
+    <!-- Minimal Controls Bar (Icon-Only, 100% Guaranteed Visible & Clickable) -->
+    <div class="flex items-center gap-2.5 relative z-50">
+      <!-- Sound Toggle (Speaker Icon Only) -->
+      <button id="btn-audio-toggle" class="header-icon-btn" title="Toggle Sound" aria-label="Toggle Sound">
+        <!-- Sound ON SVG -->
+        <svg id="icon-sound-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+        </svg>
+        <!-- Sound MUTED SVG -->
+        <svg id="icon-sound-muted" style="display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <line x1="23" y1="9" x2="17" y2="15"></line>
+          <line x1="17" y1="9" x2="23" y2="15"></line>
+        </svg>
+      </button>
+
+      <!-- Reset / Replay Diyas (Icon Only) -->
+      <button id="btn-reset-diyas" class="header-icon-btn" title="Reset Diyas" aria-label="Reset Diyas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+          <path d="M3 3v5h5"></path>
+        </svg>
+      </button>
+
+      <!-- Firecracker Dropdown Selector -->
+      <div class="relative z-50">
+        <button id="btn-cracker-menu" class="header-icon-btn flex items-center gap-1"
+          style="width: auto; padding: 0 10px; border-radius: 9999px;" title="Choose Firecracker"
+          aria-label="Choose Firecracker">
+          <span id="current-cracker-icon" class="text-sm select-none">🚀</span>
+          <svg style="width: 12px; height: 12px;" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div id="cracker-dropdown" class="glass-menu">
+          <button data-cracker-select="skyshot"
+            class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-amber-200 hover:bg-amber-500/20 transition-all text-left">
+            <span class="text-base">🚀</span>
+            <span>Sky Rocket</span>
+          </button>
+          <button data-cracker-select="anar"
+            class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-amber-200 hover:bg-amber-500/20 transition-all text-left">
+            <span class="text-base">🌋</span>
+            <span>Anar</span>
+          </button>
+          <button data-cracker-select="chakri"
+            class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-amber-200 hover:bg-amber-500/20 transition-all text-left">
+            <span class="text-base">🌀</span>
+            <span>Chakri</span>
+          </button>
+          <button data-cracker-select="sparkler"
+            class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-amber-200 hover:bg-amber-500/20 transition-all text-left">
+            <span class="text-base">✨</span>
+            <span>Phuljhadi</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- TOP HALF: NIGHT SKY & HERO GREETING -->
+  <section
+    class="relative z-20 flex-grow flex flex-col items-center justify-start pt-4 sm:pt-6 px-4 text-center pointer-events-none select-none">
+    <!-- Optional Personalized Recipient Banner (?to=Name in URL) -->
+    <div id="sky-personalized-msg" class="hidden mb-2"></div>
+
+    <!-- Shimmering Gold Title -->
+    <h1
+      class="text-3xl sm:text-5xl md:text-6xl font-black font-serif-decorative gold-shimmer-text tracking-wide drop-shadow-[0_4px_24px_rgba(255,215,0,0.4)]">
+      HAPPY DIWALI
+    </h1>
+
+    <!-- Interaction Guidance (Fades out when all diyas are lit) -->
+    <p id="sky-interaction-hint"
+      class="mt-2 text-xs sm:text-sm text-amber-200/75 font-light tracking-wide max-w-md transition-opacity duration-700">
+      The diyas on the terrace floor await a little spark.
+    </p>
+
+    <!-- Celebration Banner (Fades in when all diyas are lit) -->
+    <div id="sky-celebration-banner"
+      class="mt-2 text-xs sm:text-sm md:text-base font-serif-classic text-amber-300 font-bold opacity-0 translate-y-4 transition-all duration-700 tracking-wide drop-shadow-[0_0_20px_rgba(255,191,0,0.9)] max-w-2xl mx-auto px-4 leading-relaxed">
+      ✨ May joy, light, and prosperity illuminate your life, just as the radiant glow of diyas illuminates the rangoli ✨
+    </div>
+  </section>
+
+  <!-- BOTTOM HALF: ROOFTOP TERRACE & CITY SKYLINE VIEW (Inspired by user's reference) -->
+  <section class="relative z-20 w-full flex flex-col justify-end overflow-hidden">
+
+    <!-- 1. City Skyline Silhouette & Temple Horizon -->
+    <div class="relative w-full h-16 sm:h-20 pointer-events-none overflow-hidden flex items-end">
+      <!-- Distant City Skyline with illuminated windows & temple dome -->
+      <svg viewBox="0 0 1200 120" preserveAspectRatio="none" class="w-full h-full opacity-65">
+        <defs>
+          <linearGradient id="skylineGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#2d103c" />
+            <stop offset="100%" stop-color="#14061e" />
+          </linearGradient>
+        </defs>
+
+        <!-- Building blocks silhouette -->
+        <path
+          d="M 0,120 L 0,80 L 35,80 L 35,60 L 70,60 L 70,85 L 110,85 L 110,45 L 150,45 L 150,90 L 190,90 L 190,50 L 230,50 L 230,120 Z"
+          fill="url(#skylineGrad)" />
+        <path d="M 230,120 L 230,75 L 270,75 L 270,40 L 320,40 L 320,80 L 360,80 L 360,55 L 420,55 L 420,120 Z"
+          fill="url(#skylineGrad)" />
+
+        <!-- Central Temple Shikhar / Spire Dome (as in reference image) -->
+        <path d="M 540,120 L 540,70 Q 570,70 580,20 Q 590,5 600,0 Q 610,5 620,20 Q 630,70 660,70 L 660,120 Z"
+          fill="#2d0f3a" />
+        <circle cx="600" cy="0" r="3" fill="#ffd700" />
+
+        <!-- More buildings on right -->
+        <path d="M 660,120 L 660,65 L 710,65 L 710,40 L 770,40 L 770,85 L 820,85 L 820,45 L 870,45 L 870,120 Z"
+          fill="url(#skylineGrad)" />
+        <path
+          d="M 870,120 L 870,70 L 920,70 L 920,35 L 970,35 L 970,80 L 1020,80 L 1020,55 L 1080,55 L 1080,90 L 1200,90 L 1200,120 Z"
+          fill="url(#skylineGrad)" />
+
+        <!-- Illuminated golden window dots -->
+        <rect x="42" y="66" width="3" height="3" fill="#ffeaa7" class="twinkle-window" />
+        <rect x="52" y="66" width="3" height="3" fill="#ffeaa7" />
+        <rect x="42" y="74" width="3" height="3" fill="#ffeaa7" />
+        <rect x="118" y="55" width="4" height="4" fill="#ffd700" class="twinkle-window" />
+        <rect x="130" y="55" width="4" height="4" fill="#ffeaa7" />
+        <rect x="118" y="67" width="4" height="4" fill="#ffeaa7" />
+        <rect x="130" y="67" width="4" height="4" fill="#ffd700" class="twinkle-window" />
+        <rect x="280" y="48" width="4" height="4" fill="#ffeaa7" />
+        <rect x="295" y="48" width="4" height="4" fill="#ffeaa7" class="twinkle-window" />
+        <rect x="280" y="60" width="4" height="4" fill="#ffeaa7" />
+        <rect x="725" y="50" width="4" height="4" fill="#ffeaa7" class="twinkle-window" />
+        <rect x="740" y="50" width="4" height="4" fill="#ffeaa7" />
+        <rect x="835" y="55" width="4" height="4" fill="#ffeaa7" />
+        <rect x="850" y="55" width="4" height="4" fill="#ffd700" class="twinkle-window" />
+        <rect x="935" y="44" width="4" height="4" fill="#ffeaa7" />
+        <rect x="950" y="44" width="4" height="4" fill="#ffeaa7" class="twinkle-window" />
+      </svg>
+    </div>
+
+    <!-- 2. Glowing Multicolored Fairy String Lights (Hanging along the parapet) -->
+    <div class="relative w-full h-5 pointer-events-none z-10 flex items-center">
+      <div class="w-full h-[1px] bg-amber-400/20 absolute top-1/2"></div>
+      <div class="w-full flex justify-around px-2">
+        <span class="fairy-bulb w-2 h-2 rounded-full bg-pink-400 text-pink-400"></span>
+        <span class="fairy-bulb w-2 h-2 rounded-full bg-amber-300 text-amber-300" style="animation-delay: 0.3s;"></span>
+        <span class="fairy-bulb w-2 h-2 rounded-full bg-cyan-400 text-cyan-400" style="animation-delay: 0.6s;"></span>
+        <span class="fairy-bulb w-2 h-2 rounded-full bg-emerald-400 text-emerald-400"
+          style="animation-delay: 0.9s;"></span>
+        <span class="fairy-bulb w-2 h-2 rounded-full bg-rose-400 text-rose-400" style="animation-delay: 1.2s;"></span>
+        <span class="fairy-bulb w-2 h-2 rounded-full bg-yellow-300 text-yellow-300"
+          style="animation-delay: 0.5s;"></span>
+        <span class="fairy-bulb w-2 h-2 rounded-full bg-purple-400 text-purple-400"
+          style="animation-delay: 0.8s;"></span>
+        <span class="fairy-bulb w-2 h-2 rounded-full bg-amber-300 text-amber-300" style="animation-delay: 1.1s;"></span>
+        <span class="fairy-bulb w-2 h-2 rounded-full bg-cyan-300 text-cyan-300" style="animation-delay: 0.4s;"></span>
+        <span class="fairy-bulb w-2 h-2 rounded-full bg-pink-400 text-pink-400" style="animation-delay: 0.7s;"></span>
+        <span class="fairy-bulb w-2 h-2 rounded-full bg-emerald-400 text-emerald-400"
+          style="animation-delay: 1.3s;"></span>
+        <span class="fairy-bulb w-2 h-2 rounded-full bg-yellow-300 text-yellow-300"
+          style="animation-delay: 0.2s;"></span>
+        <span class="fairy-bulb w-2 h-2 rounded-full bg-rose-400 text-rose-400" style="animation-delay: 1.0s;"></span>
+        <span class="fairy-bulb w-2 h-2 rounded-full bg-cyan-400 text-cyan-400" style="animation-delay: 0.6s;"></span>
+      </div>
+    </div>
+
+    <!-- 3. Parapet Ledge with Miniature Ambient Glowing Diyas (as in user's image) -->
+    <div
+      class="relative w-full h-3.5 bg-gradient-to-r from-[#1d092c] via-[#2a0e3f] to-[#1d092c] border-t border-b border-amber-500/20 flex items-center justify-around px-4 pointer-events-none z-10">
+      <div class="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_#ffbf00] animate-pulse"></div>
+      <div class="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_#ffbf00] animate-pulse"
+        style="animation-delay: 0.4s;"></div>
+      <div class="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_#ffbf00] animate-pulse"
+        style="animation-delay: 0.8s;"></div>
+      <div class="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_#ffbf00] animate-pulse"
+        style="animation-delay: 0.2s;"></div>
+      <div class="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_#ffbf00] animate-pulse"
+        style="animation-delay: 0.6s;"></div>
+      <div class="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_#ffbf00] animate-pulse"
+        style="animation-delay: 1.0s;"></div>
+      <div class="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_#ffbf00] animate-pulse"
+        style="animation-delay: 0.5s;"></div>
+      <div class="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_#ffbf00] animate-pulse"
+        style="animation-delay: 0.9s;"></div>
+      <div class="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_#ffbf00] animate-pulse"
+        style="animation-delay: 0.3s;"></div>
+    </div>
+
+    <!-- 4. Tiled Courtyard Floor with Central Rangoli & 5 Geometric Diyas -->
+    <div id="terrace-floor-container"
+      class="terrace-floor relative w-full h-[38vh] sm:h-[42vh] flex items-center justify-center pointer-events-auto">
+
+      <!-- Central Circular Rangoli & Diya Mount -->
+      <div id="rangoli-container"
+        class="relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 flex items-center justify-center">
+
+        <!-- Handcrafted Traditional Floral Rangoli SVG (Completely Dark & Invisible Initially, Blooms on Lighting) -->
+        <svg id="terrace-rangoli-art" viewBox="0 0 300 300"
+          class="rangoli-graphic rangoli-unlit w-full h-full pointer-events-none select-none">
+          <defs>
+            <radialGradient id="rgCore" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#fff8db" />
+              <stop offset="40%" stop-color="#ffb703" />
+              <stop offset="100%" stop-color="#fb8500" />
+            </radialGradient>
+            <linearGradient id="petalsTeal" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00f5d4" />
+              <stop offset="100%" stop-color="#00bbf9" />
+            </linearGradient>
+            <linearGradient id="petalsRose" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ff007f" />
+              <stop offset="100%" stop-color="#9d4edd" />
+            </linearGradient>
+            <linearGradient id="petalsGold" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffe600" />
+              <stop offset="100%" stop-color="#ff9100" />
+            </linearGradient>
+          </defs>
+
+          <!-- Outer Decorative Dotted Border -->
+          <circle cx="150" cy="150" r="142" fill="none" stroke="#ffd700" stroke-width="2.5" stroke-dasharray="5,6"
+            opacity="0.85" />
+          <circle cx="150" cy="150" r="134" fill="none" stroke="#ff007f" stroke-width="2" opacity="0.7" />
+
+          <!-- Outer 12 Lotus Petals (Teal / Cyan) -->
+          <g transform="translate(150, 150)">
+            <path d="M 0,-132 C 16,-105 16,-80 0,-70 C -16,-80 -16,-105 0,-132 Z" fill="url(#petalsTeal)" />
+            <path d="M 0,-132 C 16,-105 16,-80 0,-70 C -16,-80 -16,-105 0,-132 Z" fill="url(#petalsTeal)"
+              transform="rotate(30)" />
+            <path d="M 0,-132 C 16,-105 16,-80 0,-70 C -16,-80 -16,-105 0,-132 Z" fill="url(#petalsTeal)"
+              transform="rotate(60)" />
+            <path d="M 0,-132 C 16,-105 16,-80 0,-70 C -16,-80 -16,-105 0,-132 Z" fill="url(#petalsTeal)"
+              transform="rotate(90)" />
+            <path d="M 0,-132 C 16,-105 16,-80 0,-70 C -16,-80 -16,-105 0,-132 Z" fill="url(#petalsTeal)"
+              transform="rotate(120)" />
+            <path d="M 0,-132 C 16,-105 16,-80 0,-70 C -16,-80 -16,-105 0,-132 Z" fill="url(#petalsTeal)"
+              transform="rotate(150)" />
+            <path d="M 0,-132 C 16,-105 16,-80 0,-70 C -16,-80 -16,-105 0,-132 Z" fill="url(#petalsTeal)"
+              transform="rotate(180)" />
+            <path d="M 0,-132 C 16,-105 16,-80 0,-70 C -16,-80 -16,-105 0,-132 Z" fill="url(#petalsTeal)"
+              transform="rotate(210)" />
+            <path d="M 0,-132 C 16,-105 16,-80 0,-70 C -16,-80 -16,-105 0,-132 Z" fill="url(#petalsTeal)"
+              transform="rotate(240)" />
+            <path d="M 0,-132 C 16,-105 16,-80 0,-70 C -16,-80 -16,-105 0,-132 Z" fill="url(#petalsTeal)"
+              transform="rotate(270)" />
+            <path d="M 0,-132 C 16,-105 16,-80 0,-70 C -16,-80 -16,-105 0,-132 Z" fill="url(#petalsTeal)"
+              transform="rotate(300)" />
+            <path d="M 0,-132 C 16,-105 16,-80 0,-70 C -16,-80 -16,-105 0,-132 Z" fill="url(#petalsTeal)"
+              transform="rotate(330)" />
+          </g>
+
+          <!-- Middle Floral Ring (Rose / Magenta) -->
+          <circle cx="150" cy="150" r="75" fill="#590d22" stroke="#ff758f" stroke-width="2.5" />
+          <g transform="translate(150, 150)">
+            <path d="M 0,-75 C 14,-50 14,-35 0,-28 C -14,-35 -14,-50 0,-75 Z" fill="url(#petalsRose)" />
+            <path d="M 0,-75 C 14,-50 14,-35 0,-28 C -14,-35 -14,-50 0,-75 Z" fill="url(#petalsRose)"
+              transform="rotate(45)" />
+            <path d="M 0,-75 C 14,-50 14,-35 0,-28 C -14,-35 -14,-50 0,-75 Z" fill="url(#petalsRose)"
+              transform="rotate(90)" />
+            <path d="M 0,-75 C 14,-50 14,-35 0,-28 C -14,-35 -14,-50 0,-75 Z" fill="url(#petalsRose)"
+              transform="rotate(135)" />
+            <path d="M 0,-75 C 14,-50 14,-35 0,-28 C -14,-35 -14,-50 0,-75 Z" fill="url(#petalsRose)"
+              transform="rotate(180)" />
+            <path d="M 0,-75 C 14,-50 14,-35 0,-28 C -14,-35 -14,-50 0,-75 Z" fill="url(#petalsRose)"
+              transform="rotate(225)" />
+            <path d="M 0,-75 C 14,-50 14,-35 0,-28 C -14,-35 -14,-50 0,-75 Z" fill="url(#petalsRose)"
+              transform="rotate(270)" />
+            <path d="M 0,-75 C 14,-50 14,-35 0,-28 C -14,-35 -14,-50 0,-75 Z" fill="url(#petalsRose)"
+              transform="rotate(315)" />
+          </g>
+
+          <!-- Inner Golden Petals & Geometric Star -->
+          <g transform="translate(150, 150)">
+            <path d="M 0,-36 C 8,-22 8,-12 0,-8 C -8,-12 -8,-22 0,-36 Z" fill="url(#petalsGold)" />
+            <path d="M 0,-36 C 8,-22 8,-12 0,-8 C -8,-12 -8,-22 0,-36 Z" fill="url(#petalsGold)"
+              transform="rotate(45)" />
+            <path d="M 0,-36 C 8,-22 8,-12 0,-8 C -8,-12 -8,-22 0,-36 Z" fill="url(#petalsGold)"
+              transform="rotate(90)" />
+            <path d="M 0,-36 C 8,-22 8,-12 0,-8 C -8,-12 -8,-22 0,-36 Z" fill="url(#petalsGold)"
+              transform="rotate(135)" />
+            <path d="M 0,-36 C 8,-22 8,-12 0,-8 C -8,-12 -8,-22 0,-36 Z" fill="url(#petalsGold)"
+              transform="rotate(180)" />
+            <path d="M 0,-36 C 8,-22 8,-12 0,-8 C -8,-12 -8,-22 0,-36 Z" fill="url(#petalsGold)"
+              transform="rotate(225)" />
+            <path d="M 0,-36 C 8,-22 8,-12 0,-8 C -8,-12 -8,-22 0,-36 Z" fill="url(#petalsGold)"
+              transform="rotate(270)" />
+            <path d="M 0,-36 C 8,-22 8,-12 0,-8 C -8,-12 -8,-22 0,-36 Z" fill="url(#petalsGold)"
+              transform="rotate(315)" />
+          </g>
+
+          <!-- Core Glowing Sun Circle -->
+          <circle cx="150" cy="150" r="18" fill="url(#rgCore)" stroke="#fff" stroke-width="2" />
+        </svg>
+
+        <!-- 5 GEOMETRICALLY POSITIONED CLAY DIYAS (Unlit by default, NO flame until clicked) -->
+        <div id="rangoli-diyas-layer" class="absolute inset-0 pointer-events-auto">
+
+          <!-- Diya 0: Center -->
+          <div class="diya-slot" data-diya="0" style="left: 50%; top: 50%;" role="button" aria-label="Center Diya">
+            <div class="diya-flame-wrapper">
+              <div class="flame-glow"></div>
+              <svg class="flame-svg animate-flicker" viewBox="0 0 100 160">
+                <path d="M 50,0 C 65,45 90,85 90,120 C 90,145 72,160 50,160 C 28,160 10,145 10,120 C 10,85 35,45 50,0 Z"
+                  fill="url(#flameGradShared)" />
+              </svg>
+            </div>
+            <div class="diya-wick"></div>
+            <svg class="diya-bowl-svg" viewBox="0 0 100 50">
+              <path d="M 5,12 C 15,45 85,45 95,12 C 85,16 65,18 50,18 C 35,18 15,16 5,12 Z"
+                fill="url(#clayGradShared)" />
+              <ellipse cx="50" cy="14" rx="46" ry="6" fill="none" stroke="url(#goldGradShared)" stroke-width="3.5" />
+            </svg>
+          </div>
+
+          <!-- Diya 1: North (Top) -->
+          <div class="diya-slot" data-diya="1" style="left: 50%; top: 13%;" role="button" aria-label="North Diya">
+            <div class="diya-flame-wrapper">
+              <div class="flame-glow"></div>
+              <svg class="flame-svg animate-flicker" viewBox="0 0 100 160">
+                <path d="M 50,0 C 65,45 90,85 90,120 C 90,145 72,160 50,160 C 28,160 10,145 10,120 C 10,85 35,45 50,0 Z"
+                  fill="url(#flameGradShared)" />
+              </svg>
+            </div>
+            <div class="diya-wick"></div>
+            <svg class="diya-bowl-svg" viewBox="0 0 100 50">
+              <path d="M 5,12 C 15,45 85,45 95,12 C 85,16 65,18 50,18 C 35,18 15,16 5,12 Z"
+                fill="url(#clayGradShared)" />
+              <ellipse cx="50" cy="14" rx="46" ry="6" fill="none" stroke="url(#goldGradShared)" stroke-width="3.5" />
+            </svg>
+          </div>
+
+          <!-- Diya 2: South (Bottom) -->
+          <div class="diya-slot" data-diya="2" style="left: 50%; top: 87%;" role="button" aria-label="South Diya">
+            <div class="diya-flame-wrapper">
+              <div class="flame-glow"></div>
+              <svg class="flame-svg animate-flicker" viewBox="0 0 100 160">
+                <path d="M 50,0 C 65,45 90,85 90,120 C 90,145 72,160 50,160 C 28,160 10,145 10,120 C 10,85 35,45 50,0 Z"
+                  fill="url(#flameGradShared)" />
+              </svg>
+            </div>
+            <div class="diya-wick"></div>
+            <svg class="diya-bowl-svg" viewBox="0 0 100 50">
+              <path d="M 5,12 C 15,45 85,45 95,12 C 85,16 65,18 50,18 C 35,18 15,16 5,12 Z"
+                fill="url(#clayGradShared)" />
+              <ellipse cx="50" cy="14" rx="46" ry="6" fill="none" stroke="url(#goldGradShared)" stroke-width="3.5" />
+            </svg>
+          </div>
+
+          <!-- Diya 3: West (Left) -->
+          <div class="diya-slot" data-diya="3" style="left: 13%; top: 50%;" role="button" aria-label="West Diya">
+            <div class="diya-flame-wrapper">
+              <div class="flame-glow"></div>
+              <svg class="flame-svg animate-flicker" viewBox="0 0 100 160">
+                <path d="M 50,0 C 65,45 90,85 90,120 C 90,145 72,160 50,160 C 28,160 10,145 10,120 C 10,85 35,45 50,0 Z"
+                  fill="url(#flameGradShared)" />
+              </svg>
+            </div>
+            <div class="diya-wick"></div>
+            <svg class="diya-bowl-svg" viewBox="0 0 100 50">
+              <path d="M 5,12 C 15,45 85,45 95,12 C 85,16 65,18 50,18 C 35,18 15,16 5,12 Z"
+                fill="url(#clayGradShared)" />
+              <ellipse cx="50" cy="14" rx="46" ry="6" fill="none" stroke="url(#goldGradShared)" stroke-width="3.5" />
+            </svg>
+          </div>
+
+          <!-- Diya 4: East (Right) -->
+          <div class="diya-slot" data-diya="4" style="left: 87%; top: 50%;" role="button" aria-label="East Diya">
+            <div class="diya-flame-wrapper">
+              <div class="flame-glow"></div>
+              <svg class="flame-svg animate-flicker" viewBox="0 0 100 160">
+                <path d="M 50,0 C 65,45 90,85 90,120 C 90,145 72,160 50,160 C 28,160 10,145 10,120 C 10,85 35,45 50,0 Z"
+                  fill="url(#flameGradShared)" />
+              </svg>
+            </div>
+            <div class="diya-wick"></div>
+            <svg class="diya-bowl-svg" viewBox="0 0 100 50">
+              <path d="M 5,12 C 15,45 85,45 95,12 C 85,16 65,18 50,18 C 35,18 15,16 5,12 Z"
+                fill="url(#clayGradShared)" />
+              <ellipse cx="50" cy="14" rx="46" ry="6" fill="none" stroke="url(#goldGradShared)" stroke-width="3.5" />
+            </svg>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- Shared SVG Gradients Defs for Diyas -->
+  <svg width="0" height="0" class="absolute">
+    <defs>
+      <linearGradient id="flameGradShared" x1="0%" y1="100%" x2="0%" y2="0%">
+        <stop offset="0%" stop-color="#ff2a00" />
+        <stop offset="30%" stop-color="#ff8c00" />
+        <stop offset="70%" stop-color="#ffd600" />
+        <stop offset="100%" stop-color="#ffffff" />
+      </linearGradient>
+      <linearGradient id="clayGradShared" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#e65100" />
+        <stop offset="50%" stop-color="#bf360c" />
+        <stop offset="100%" stop-color="#4e1505" />
+      </linearGradient>
+      <linearGradient id="goldGradShared" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#ffe082" />
+        <stop offset="50%" stop-color="#ffd54f" />
+        <stop offset="100%" stop-color="#ffb300" />
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <!-- SUBTLE TOAST NOTIFICATION -->
+  <div id="subtle-toast"
+    class="fixed top-14 left-1/2 -translate-x-1/2 z-50 px-4 py-1.5 rounded-full bg-stone-900/95 border border-amber-500/40 text-amber-200 text-xs sm:text-sm font-medium shadow-lg backdrop-blur-md opacity-0 -translate-y-2 pointer-events-none transition-all duration-300 max-w-[92vw] text-center">
+    Notification
+  </div>
+
+  <!-- JavaScript Scripts -->
+  <script src="js/audio.js"></script>
+  <script src="js/fireworks.js"></script>
+  <script src="js/diyas.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
+</html>
